@@ -4,8 +4,8 @@ import matplotlib.pyplot as plt
 '''
 Approach:
 
-Note that states are defined by a single positive integer, the amount of money
-Actions are also defined by a single positive integer, the kh
+Note that states are defined by a single positive integer, the current amount of money.
+Actions are also defined by a single positive integer, the amount bet.
 '''
 
 
@@ -34,6 +34,7 @@ class GamblerSingleton:
         self.values = [initial] * (N + 1)
         self.values[0] = 0
         self.values[N] = 1
+        self.shouldGraphValues = False
 
     def getValue(self, state: GamblerState) -> float:
         return self.values[state.i]
@@ -71,35 +72,37 @@ class GamblerSingleton:
 
     def valueIteration(self) -> List[int]:
         theta, gamma = self.theta, self.gamma
-        delta, i = 0.5, 0
+        i = 0
         while True:
-            print('iteration {} delta {} theta {}'.format(i, delta, theta))
+            delta = 0.0
             for state in self.states:
                 curVal = self.getValue(state)
                 newValue = self.setValue(state)
-                delta = min(delta, abs(curVal - newValue))
+                delta = max(delta, abs(curVal - newValue))
             if delta < theta:
                 break
+            print('iteration {} delta {} theta {}'.format(i, delta, theta))
             i += 1
         return self.getPolicy()
 
     def graph(self):
         names = range(1, self.N)
         values = self.getPolicy()
+        if self.shouldGraphValues:
+            values = self.values[1:100]
 
         fig, axs = plt.subplots(1, 1, figsize=(9, 3), sharey=True)
         axs.bar(names, values)
-        # axs[1].scatter(names, values)
-        # axs[2].plot(names, values)
         fig.suptitle('Gambler pHeads {} theta {} gamma {}'.format(self.pHeads, self.theta, self.gamma))
         plt.show()
 
 if __name__ == '__main__':
-    gs = GamblerSingleton(0.5, 0.00001, 0.4, 100, 0.4)
+    startVal = 0.5
+    gs = GamblerSingleton(initial=startVal, theta = 10 ** -10, gamma = 0.4, N = 100, pHeads = 0.5)
     testStates = [GamblerState(i, 100) for i in [1, 40, 50, 51, 70, 99]]
     for testState in testStates:
         print('testState {}'.format(testState))
-        assert gs.getValue(testState) == 0.5
+        assert gs.getValue(testState) == startVal
 
     print(gs.valueIteration())
     gs.graph()
