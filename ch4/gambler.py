@@ -98,7 +98,7 @@ class GamblerSingleton:
 
 if __name__ == '__main__':
     startVal = 0.5
-    gs = GamblerSingleton(initial=startVal, theta = 10 ** -10, gamma = 0.4, N = 100, pHeads = 0.5)
+    gs = GamblerSingleton(initial=startVal, theta = 10 ** -10, gamma = 0.4, N = 100, pHeads = 0.25)
     testStates = [GamblerState(i, 100) for i in [1, 40, 50, 51, 70, 99]]
     for testState in testStates:
         print('testState {}'.format(testState))
